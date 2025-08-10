@@ -1,35 +1,5 @@
 const main = document.querySelector('.products-grid')
 
-const products = [
-    {
-        name: 'Black and Gray Athletic Cotton Socks - 6 Pairs',
-        img: `images/products/athletic-cotton-socks-6-pairs.jpg` ,
-        priceCents: 1090,
-        rating: {
-            stars: 4.5,
-            count: 87
-        } ,
-    },
-    {
-        name: 'Intermediate Size Basketball',
-        img: `images/products/intermediate-composite-basketball.jpg` ,
-        priceCents: 2095,
-        rating: {
-            stars: 4,
-            count: 127
-        } ,
-    },
-    {
-        name: ' Adults Plain Cotton T-Shirt - 2 Pack',
-        img: `images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg` ,
-        priceCents: 799,
-        rating: {
-            stars: 4.5,
-            count: 56
-        } ,
-    },
-]
-
 let productsHtml = ''
 
 products.forEach((product) => {
@@ -37,7 +7,7 @@ products.forEach((product) => {
         <div class="product-container">
           <div class="product-image-container">
             <img class="product-image"
-              src="${product.img}">
+              src="${product.image}">
           </div>
 
           <div class="product-name limit-text-to-2-lines">
