@@ -1,4 +1,4 @@
-const main = document.querySelector('.products-grid')
+const productsGrid = document.querySelector('.products-grid')
 
 let productsHtml = ''
 
@@ -55,4 +55,4 @@ products.forEach((product) => {
     `
 });
 
-main.innerHTML = productsHtml
+productsGrid.innerHTML = productsHtml
