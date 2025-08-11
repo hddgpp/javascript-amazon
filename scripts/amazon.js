@@ -1,4 +1,5 @@
 const productsGrid = document.querySelector('.products-grid')
+const cartQ = document.querySelector('.cart-quantity')
 
 products.forEach((product) => {
   const productContainer = document.createElement('div')
@@ -68,8 +69,10 @@ products.forEach((product) => {
   //Add to Cart button logic
 
   addToCartButton.addEventListener('click', () => {
+
     const productId = addToCartButton.dataset.productId
     const productQuantity = parseInt(select.value)
+
     const existingProduct = cart.find(item => item.productId === productId)
 
   if (existingProduct) {
@@ -80,6 +83,8 @@ products.forEach((product) => {
       quantity: productQuantity
     });
   }
+    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartQ.textContent = totalQuantity
     console.log(cart)
   });
   
