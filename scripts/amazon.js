@@ -62,10 +62,25 @@ products.forEach((product) => {
   // Add to Cart button
   const addToCartButton = document.createElement('button')
   addToCartButton.classList.add('add-to-cart-button', 'button-primary',)
+  addToCartButton.setAttribute('data-product-id', product.id);
   addToCartButton.textContent = 'Add to Cart'
 
+  //Add to Cart button logic
+
   addToCartButton.addEventListener('click', () => {
-    console.log(`Added ${product.name} to cart`)
+    const productId = addToCartButton.dataset.productId
+    const productQuantity = parseInt(select.value)
+    const existingProduct = cart.find(item => item.productId === productId)
+
+  if (existingProduct) {
+    existingProduct.quantity += productQuantity
+  } else {
+    cart.push({
+      productId: productId,
+      quantity: productQuantity
+    });
+  }
+    console.log(cart)
   });
   
 
