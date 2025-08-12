@@ -73,8 +73,9 @@ products.forEach((product) => {
 
   let addedTimer;
 
-  addToCartButton.addEventListener('click', () => {
-     addedToCart.style.opacity = 1
+  function addBtnLogic() {
+    
+    addedToCart.style.opacity = 1
      clearTimeout(addedTimer);
      addedTimer = setTimeout(() => {
         addedToCart.style.opacity = 0
@@ -96,6 +97,10 @@ products.forEach((product) => {
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
     cartQ.textContent = totalQuantity
     console.log(cart)
+  }
+
+  addToCartButton.addEventListener('click', () => {
+     addBtnLogic()
   });
   
 
