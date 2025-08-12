@@ -1,3 +1,6 @@
+import {cart} from '../data/cart.js'
+import {products} from '../data/products.js'
+
 const productsGrid = document.querySelector('.products-grid')
 const cartQ = document.querySelector('.cart-quantity')
 
@@ -68,7 +71,14 @@ products.forEach((product) => {
 
   //Add to Cart button logic
 
+  let addedTimer;
+
   addToCartButton.addEventListener('click', () => {
+     addedToCart.style.opacity = 1
+     clearTimeout(addedTimer);
+     addedTimer = setTimeout(() => {
+        addedToCart.style.opacity = 0
+    }, 2000);
 
     const productId = addToCartButton.dataset.productId
     const productQuantity = parseInt(select.value)
