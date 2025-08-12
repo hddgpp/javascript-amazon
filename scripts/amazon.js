@@ -1,10 +1,10 @@
-import {cart} from '../data/cart.js'
 import {products} from '../data/products.js'
+import {cart} from '../data/cart.js'
 
 const productsGrid = document.querySelector('.products-grid')
 const cartQ = document.querySelector('.cart-quantity')
 
-products.forEach((product) => {
+ products.forEach((product) => {
   const productContainer = document.createElement('div')
   productContainer.classList.add('product-container')
 
@@ -71,10 +71,10 @@ products.forEach((product) => {
 
   //Add to Cart button logic
 
-  let addedTimer;
+  
+function addBtnLogic() {
+    let addedTimer;
 
-  function addBtnLogic() {
-    
     addedToCart.style.opacity = 1
      clearTimeout(addedTimer);
      addedTimer = setTimeout(() => {
