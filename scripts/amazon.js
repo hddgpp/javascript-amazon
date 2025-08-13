@@ -71,9 +71,10 @@ const cartQ = document.querySelector('.cart-quantity')
 
   //Add to Cart button logic
 
+  let addedTimer;
   
 function addBtnLogic() {
-    let addedTimer;
+    
 
     addedToCart.style.opacity = 1
      clearTimeout(addedTimer);
