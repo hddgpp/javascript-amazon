@@ -72,15 +72,16 @@ const cartQ = document.querySelector('.cart-quantity')
   //Add to Cart button logic
 
   let addedTimer;
-  
-function addBtnLogic() {
-    
 
+  function addedTimeOut() {
     addedToCart.style.opacity = 1
      clearTimeout(addedTimer);
      addedTimer = setTimeout(() => {
         addedToCart.style.opacity = 0
     }, 2000);
+  }
+
+  function addBtnLogic() {
 
     const productId = addToCartButton.dataset.productId
     const productQuantity = parseInt(select.value)
@@ -102,6 +103,7 @@ function addBtnLogic() {
 
   addToCartButton.addEventListener('click', () => {
      addBtnLogic()
+     addedTimeOut()
   });
   
 
