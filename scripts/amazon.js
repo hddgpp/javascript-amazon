@@ -1,5 +1,5 @@
 import { products } from '../data/products.js';
-import { createProductCard } from './product.js';
+import { createProductCard } from './amazon.product.js';
 
 const productsGrid = document.querySelector('.products-grid');
 const cartQ = document.querySelector('.cart-quantity');
