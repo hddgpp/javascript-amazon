@@ -51,7 +51,9 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
     if (existingProduct) {
       existingProduct.quantity += productQuantity;
     } else {
-      cart.push({ productId, quantity: productQuantity });
+      cart.push({
+         productId,
+         quantity: productQuantity });
     }
 
     const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
