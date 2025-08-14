@@ -16,7 +16,7 @@ export function createAddedToCartElement() {
 
 // Create quantity selector
 export function createQuantitySelector() {
- const select = document.createElement('select');
+  const select = document.createElement('select');
   for (let i = 1; i <= 10; i++) {
     const option = document.createElement('option');
     option.value = i;
@@ -25,6 +25,18 @@ export function createQuantitySelector() {
     select.appendChild(option);
   }
   return select;
+}
+
+// NEW: Function to update total quantity display
+export function updateCartQuantityDisplay(cartQ) {
+  const cart = getCart();
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  if (cartQ) {
+    cartQ.textContent = totalQuantity;
+  }
+
+  return totalQuantity; // ✅ Now returns a number
 }
 
 // Create Add to Cart button
@@ -43,28 +55,29 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
       addedToCart.style.opacity = 0;
     }, 2000);
   }
+
   function addBtnLogic() {
-  const cart = getCart(); // pull latest cart from localStorage
-  const productQuantity = parseInt(select.value);
-  const existingProduct = cart.find(item => item.productId === productId);
+    const cart = getCart(); // pull latest cart from localStorage
+    const productQuantity = parseInt(select.value);
+    const existingProduct = cart.find(item => item.productId === productId);
 
-  if (existingProduct) {
-    existingProduct.quantity += productQuantity;
-  } else {
-    cart.push({
-      productId,
-      quantity: productQuantity
-    });
+    if (existingProduct) {
+      existingProduct.quantity += productQuantity;
+    } else {
+      cart.push({
+        productId,
+        quantity: productQuantity
+      });
+    }
+
+    // Save updated cart to localStorage
+    saveCart(cart);
+
+    // Now call the shared function
+    updateCartQuantityDisplay(cartQ);
+
+    console.log(cart);
   }
-
-  // Save updated cart to localStorage
-  saveCart(cart);
-
-  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-  cartQ.textContent = totalQuantity;
-  console.log(cart);
-}
-
 
   addToCartButton.addEventListener('click', () => {
     addBtnLogic();

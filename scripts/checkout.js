@@ -1,5 +1,13 @@
 import { products } from '../data/products.js';
 import { getCart, saveCart } from '../data/cart.js';
+import { updateCartQuantityDisplay } from './amazon.product.js';
+
+const returnToHomeLink = document.querySelector('.return-to-home-link');
+
+// Get quantity from function and put it in link
+const totalQuantity = updateCartQuantityDisplay(); 
+returnToHomeLink.textContent = `Checkout ${totalQuantity} items`;
+
 let cart = getCart();
 
 const orderSummary = document.querySelector('.order-summary');
@@ -64,18 +72,23 @@ cart.forEach(cartItem => {
 
   const deleteLink = productQuantity.querySelector('.delete-quantity-link');
 deleteLink.addEventListener('click', () => {
-  // 1. Remove from cart array
+  // Remove from cart array
   const index = cart.findIndex(item => item.productId === productId);
-if (index !== -1) {
-  cart.splice(index, 1);
-  saveCart(cart);
-}
+  if (index !== -1) {
+    cart.splice(index, 1);
+    saveCart(cart);
+  }
 
+  // Remove from DOM
   cartItemContainer.remove();
- cartStorage()
+
+  // Recalculate quantity and update text
+  const newTotal = updateCartQuantityDisplay();
+  returnToHomeLink.textContent = `Checkout ${newTotal} items`;
 
   console.log(`Deleted product with ID: ${productId}`);
 });
+
 
   // Delivery options
   const deliveryOptions = document.createElement('div');
