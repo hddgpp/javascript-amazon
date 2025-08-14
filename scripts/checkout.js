@@ -1,5 +1,6 @@
 import { products } from '../data/products.js';
-import { cart } from '../data/cart.js';
+import { getCart, saveCart } from '../data/cart.js';
+let cart = getCart();
 
 const orderSummary = document.querySelector('.order-summary');
 orderSummary.innerHTML = ''; // Clear any existing content
@@ -65,11 +66,13 @@ cart.forEach(cartItem => {
 deleteLink.addEventListener('click', () => {
   // 1. Remove from cart array
   const index = cart.findIndex(item => item.productId === productId);
-  if (index !== -1) {
-    cart.splice(index, 1);
-  }
+if (index !== -1) {
+  cart.splice(index, 1);
+  saveCart(cart);
+}
 
   cartItemContainer.remove();
+ cartStorage()
 
   console.log(`Deleted product with ID: ${productId}`);
 });
@@ -121,3 +124,7 @@ deleteLink.addEventListener('click', () => {
   // Append entire cart item to order summary
   orderSummary.appendChild(cartItemContainer);
 });
+
+if (cart.length === 0) {
+  orderSummary.innerHTML = `<p>Your cart is empty.</p>`;
+}

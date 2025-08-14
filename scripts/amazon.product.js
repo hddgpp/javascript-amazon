@@ -1,4 +1,4 @@
-import {cart} from '../data/cart.js';
+import { getCart, saveCart } from '../data/cart.js';
 
 // Create the "Added to Cart" message element
 export function createAddedToCartElement() {
@@ -43,23 +43,28 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
       addedToCart.style.opacity = 0;
     }, 2000);
   }
+  function addBtnLogic() {
+  const cart = getCart(); // pull latest cart from localStorage
+  const productQuantity = parseInt(select.value);
+  const existingProduct = cart.find(item => item.productId === productId);
 
-   function addBtnLogic() {
-    const productQuantity = parseInt(select.value);
-    const existingProduct = cart.find(item => item.productId === productId);
-
-    if (existingProduct) {
-      existingProduct.quantity += productQuantity;
-    } else {
-      cart.push({
-         productId,
-         quantity: productQuantity });
-    }
-
-    const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-    cartQ.textContent = totalQuantity;
-    console.log(cart);
+  if (existingProduct) {
+    existingProduct.quantity += productQuantity;
+  } else {
+    cart.push({
+      productId,
+      quantity: productQuantity
+    });
   }
+
+  // Save updated cart to localStorage
+  saveCart(cart);
+
+  const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  cartQ.textContent = totalQuantity;
+  console.log(cart);
+}
+
 
   addToCartButton.addEventListener('click', () => {
     addBtnLogic();
