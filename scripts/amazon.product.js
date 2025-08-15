@@ -1,5 +1,7 @@
 import { getCart, saveCart } from '../data/cart.js';
 
+const cartQunaity = document.querySelector('.cart-quantity')
+
 // Create the "Added to Cart" message element
 export function createAddedToCartElement() {
   const addedToCart = document.createElement('div');
@@ -77,6 +79,7 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
     updateCartQuantityDisplay(cartQ);
 
     console.log(cart);
+
   }
 
   addToCartButton.addEventListener('click', () => {
@@ -86,6 +89,7 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
 
   return addToCartButton;
 }
+
 
 // Create the full product card
 export function createProductCard(product, cartQ) {
@@ -149,4 +153,7 @@ export function createProductCard(product, cartQ) {
   productContainer.appendChild(addToCartButton);
 
   return productContainer;
-}
+  }
+
+
+

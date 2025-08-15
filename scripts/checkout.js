@@ -70,6 +70,44 @@ cart.forEach(cartItem => {
   `;
   cartItemDetails.appendChild(productQuantity);
 
+  const updateLink = productQuantity.querySelector('.update-quantity-link')
+
+updateLink.addEventListener('click', () => {
+  const updateInput = document.createElement('input');
+  updateInput.type = 'number';
+  updateInput.value = cartItem.quantity;
+  updateInput.min = 1;
+
+  // Replace the quantity label with the input
+  const quantityLabel = productQuantity.querySelector('.quantity-label');
+  quantityLabel.replaceWith(updateInput);
+
+  updateInput.focus();
+
+  updateInput.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      const newQuantity = Number(updateInput.value);
+
+      if (newQuantity > 0) {
+        // Update the cart
+        const index = cart.findIndex(item => item.productId === productId);
+        if (index !== -1) {
+          cart[index].quantity = newQuantity;
+          saveCart(cart);
+        }
+
+        // Update the display
+        updateInput.replaceWith(quantityLabel);
+        quantityLabel.textContent = newQuantity;
+
+        // Update the total quantity display in header
+        const newTotal = updateCartQuantityDisplay();
+        returnToHomeLink.textContent = `Checkout ${newTotal} items`;
+      }
+    }
+  });
+});
+
   const deleteLink = productQuantity.querySelector('.delete-quantity-link');
 deleteLink.addEventListener('click', () => {
   // Remove from cart array
