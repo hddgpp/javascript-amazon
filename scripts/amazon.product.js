@@ -68,7 +68,8 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
     } else {
       cart.push({
         productId,
-        quantity: productQuantity
+        quantity: productQuantity,
+        deliveryOptionId: '1'
       });
     }
 
