@@ -5,3 +5,4 @@ export function getCart() {
 export function saveCart(cart) {
   localStorage.setItem('cart', JSON.stringify(cart));
 }
+
