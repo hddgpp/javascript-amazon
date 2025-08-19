@@ -169,7 +169,7 @@ cart.forEach(cartItem => {
 
   const productPrice = document.createElement('div');
   productPrice.className = 'product-price';
-  productPrice.textContent = `$${(matchingProduct.priceCents / 100).toFixed(2)}`;
+  productPrice.textContent = `$${(Math.round(matchingProduct.priceCents) / 100).toFixed(2)}`;
   cartItemDetails.appendChild(productPrice);
 
   // Quantity controls

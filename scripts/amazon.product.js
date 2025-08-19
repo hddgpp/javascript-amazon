@@ -125,7 +125,7 @@ export function createProductCard(product, cartQ) {
   // Price
   const priceDiv = document.createElement('div');
   priceDiv.classList.add('product-price');
-  priceDiv.textContent = `$${(product.priceCents / 100).toFixed(2)}`;
+  priceDiv.textContent = `$${(Math.round(product.priceCents) / 100).toFixed(2)}`;
 
   // Quantity
   const quantityContainer = document.createElement('div');
