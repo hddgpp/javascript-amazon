@@ -14,9 +14,125 @@ returnToHomeLink.textContent = `Checkout ${totalQuantity} items`;
 const orderSummary = document.querySelector('.order-summary');
 orderSummary.innerHTML = ''; // Clear any existing content
 
+// payment summary 
+const paymentSummaryContainer = document.querySelector('.payment-summary');
+paymentSummaryContainer.innerHTML = ''; // Clear existing content
+
+function calculateCartTotals() {
+  let itemsTotal = 0;
+  let shippingTotal = 0;
+
+  cart.forEach(cartItem => {
+    const product = products.find(p => p.id === cartItem.productId);
+    itemsTotal += product.priceCents * cartItem.quantity;
+
+    const deliveryOption = deliveryOptionArr.find(opt => opt.id === cartItem.deliveryOptionId) || deliveryOptionArr[0];
+    shippingTotal += deliveryOption.priceCent;
+  });
+
+  const subtotal = itemsTotal + shippingTotal;
+  const estimatedTax = subtotal * 0.1; // 10% tax
+  const orderTotal = subtotal + estimatedTax;
+
+  return {
+    itemsTotalCents: itemsTotal,
+    shippingCents: shippingTotal,
+    subtotalCents: subtotal,
+    taxCents: estimatedTax,
+    orderTotalCents: orderTotal
+  };
+}
+
+function renderPaymentSummary() {
+  paymentSummaryContainer.innerHTML = ''; // clear previous
+
+  const totals = calculateCartTotals();
+  const formatMoney = (cents) => `$${(cents / 100).toFixed(2)}`;
+
+  // Title
+  const title = document.createElement('div');
+  title.className = 'payment-summary-title';
+  title.textContent = 'Order Summary';
+  paymentSummaryContainer.appendChild(title);
+
+  // Items row
+  const itemsRow = document.createElement('div');
+  itemsRow.className = 'payment-summary-row';
+  const itemsLabel = document.createElement('div');
+  itemsLabel.textContent = `Items (${cart.reduce((sum, item) => sum + item.quantity, 0)}):`;
+  const itemsMoney = document.createElement('div');
+  itemsMoney.className = 'payment-summary-money';
+  itemsMoney.textContent = formatMoney(totals.itemsTotalCents);
+  itemsRow.appendChild(itemsLabel);
+  itemsRow.appendChild(itemsMoney);
+  paymentSummaryContainer.appendChild(itemsRow);
+
+  // Shipping row
+  const shippingRow = document.createElement('div');
+  shippingRow.className = 'payment-summary-row';
+  const shippingLabel = document.createElement('div');
+  shippingLabel.textContent = 'Shipping & handling:';
+  const shippingMoney = document.createElement('div');
+  shippingMoney.className = 'payment-summary-money';
+  shippingMoney.textContent = formatMoney(totals.shippingCents);
+  shippingRow.appendChild(shippingLabel);
+  shippingRow.appendChild(shippingMoney);
+  paymentSummaryContainer.appendChild(shippingRow);
+
+  // Subtotal row
+  const subtotalRow = document.createElement('div');
+  subtotalRow.className = 'payment-summary-row subtotal-row';
+  const subtotalLabel = document.createElement('div');
+  subtotalLabel.textContent = 'Total before tax:';
+  const subtotalMoney = document.createElement('div');
+  subtotalMoney.className = 'payment-summary-money';
+  subtotalMoney.textContent = formatMoney(totals.subtotalCents);
+  subtotalRow.appendChild(subtotalLabel);
+  subtotalRow.appendChild(subtotalMoney);
+  paymentSummaryContainer.appendChild(subtotalRow);
+
+  // Tax row
+  const taxRow = document.createElement('div');
+  taxRow.className = 'payment-summary-row';
+  const taxLabel = document.createElement('div');
+  taxLabel.textContent = 'Estimated tax (10%):';
+  const taxMoney = document.createElement('div');
+  taxMoney.className = 'payment-summary-money';
+  taxMoney.textContent = formatMoney(totals.taxCents);
+  taxRow.appendChild(taxLabel);
+  taxRow.appendChild(taxMoney);
+  paymentSummaryContainer.appendChild(taxRow);
+
+  // Order total row
+  const totalRow = document.createElement('div');
+  totalRow.className = 'payment-summary-row total-row';
+  const totalLabel = document.createElement('div');
+  totalLabel.textContent = 'Order total:';
+  const totalMoney = document.createElement('div');
+  totalMoney.className = 'payment-summary-money';
+  totalMoney.textContent = formatMoney(totals.orderTotalCents);
+  totalRow.appendChild(totalLabel);
+  totalRow.appendChild(totalMoney);
+  paymentSummaryContainer.appendChild(totalRow);
+
+  // Place order button
+  const placeOrderBtn = document.createElement('button');
+  placeOrderBtn.className = 'place-order-button button-primary';
+  placeOrderBtn.textContent = 'Place your order';
+  paymentSummaryContainer.appendChild(placeOrderBtn);
+}
+
+// Initial render
+renderPaymentSummary();
+
+function updatePaymentSummary() {
+  renderPaymentSummary();
+}
+
+// this is the end of the payment summary
+
 cart.forEach(cartItem => {
   const productId = cartItem.productId;
-
   const matchingProduct = products.find(p => p.id === productId);
 
   // Container
@@ -95,6 +211,9 @@ cart.forEach(cartItem => {
 
           const newTotal = updateCartQuantityDisplay();
           returnToHomeLink.textContent = `Checkout ${newTotal} items`;
+
+          // Update payment summary
+          updatePaymentSummary();
         }
       }
     });
@@ -111,6 +230,9 @@ cart.forEach(cartItem => {
     cartItemContainer.remove();
     const newTotal = updateCartQuantityDisplay();
     returnToHomeLink.textContent = `Checkout ${newTotal} items`;
+
+    // Update payment summary
+    updatePaymentSummary();
   });
 
   // Delivery options
@@ -164,6 +286,9 @@ cart.forEach(cartItem => {
         if (index !== -1) {
           cart[index].deliveryOptionId = option.id;
           saveCart(cart);
+
+          // Update payment summary
+          updatePaymentSummary();
         }
       }
     });
@@ -173,7 +298,9 @@ cart.forEach(cartItem => {
 });
 
 if (cart.length === 0) {
-  orderSummary.innerHTML = `<p>Your cart is empty.</p>`;
-}
+  orderSummary.innerHTML = `<p>Your cart is empty.</p>
+  <a href="amazon.html"><button class="button-primary">Home</button></a>
+  `;
 
-console.log(cart);
+  paymentSummaryContainer.innerHTML = '';
+}
