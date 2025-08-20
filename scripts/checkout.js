@@ -43,7 +43,7 @@ function calculateCartTotals() {
   };
 }
 
-function renderPaymentSummary() {
+export function renderPaymentSummary() {
   paymentSummaryContainer.innerHTML = ''; // clear previous
 
   const totals = calculateCartTotals();
