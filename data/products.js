@@ -1,3 +1,19 @@
+class p {
+  id;
+  image;
+  name;
+  rating;
+  priceCents;
+  constructor(productsDetails) {
+    this.id = productsDetails.id
+    this.image = productsDetails.image
+    this.name = productsDetails.name
+    this.rating = productsDetails.rating
+    this.priceCents = productsDetails.priceCents
+  }
+}
+
+
 export const products = [
   {
     id: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
@@ -657,4 +673,6 @@ export const products = [
       "mens"
     ]
   }
-];
+].map((productsDetails) => {
+  return new p(productsDetails)
+})
