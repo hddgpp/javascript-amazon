@@ -1,20 +1,7 @@
 import { getCart, saveCart } from '../data/cart.js';
+import { products } from '../data/products.js';
 
-const cartQunaity = document.querySelector('.cart-quantity')
-
-// Create the "Added to Cart" message element
-export function createAddedToCartElement() {
-  const addedToCart = document.createElement('div');
-  addedToCart.classList.add('added-to-cart');
-
-  const checkmarkImg = document.createElement('img');
-  checkmarkImg.src = 'images/icons/checkmark.png';
-
-  addedToCart.appendChild(checkmarkImg);
-  addedToCart.appendChild(document.createTextNode('Added'));
-
-  return addedToCart;
-}
+const cartQunaity = document.querySelector('.cart-quantity');
 
 // Create quantity selector
 export function createQuantitySelector() {
@@ -23,30 +10,38 @@ export function createQuantitySelector() {
     const option = document.createElement('option');
     option.value = i;
     option.textContent = i;
-    if (i === 1) option.selected = true;
     select.appendChild(option);
   }
   return select;
 }
 
-// NEW: Function to update total quantity display
+// Create "Added to Cart" element
+export function createAddedToCartElement() {
+  const addedDiv = document.createElement('div');
+  addedDiv.classList.add('added-to-cart');
+
+  const checkmark = document.createElement('img');
+  checkmark.src = 'images/icons/checkmark.png';
+  addedDiv.appendChild(checkmark);
+  addedDiv.appendChild(document.createTextNode('Added'));
+
+  return addedDiv;
+}
+
+// Update cart quantity display
 export function updateCartQuantityDisplay(cartQ) {
   const cart = getCart();
   const totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  if (cartQ) {
-    cartQ.textContent = totalQuantity;
-  }
-
-  return totalQuantity; // ✅ Now returns a number
+  if (cartQ) cartQ.textContent = totalQuantity;
+  return totalQuantity;
 }
 
-// Create Add to Cart button
+// Create Add to Cart Button
 export function createAddToCartButton(productId, select, addedToCart, cartQ) {
-  const addToCartButton = document.createElement('button');
-  addToCartButton.classList.add('add-to-cart-button', 'button-primary');
-  addToCartButton.setAttribute('data-product-id', productId);
-  addToCartButton.textContent = 'Add to Cart';
+  const button = document.createElement('button');
+  button.classList.add('add-to-cart-button', 'button-primary');
+  button.dataset.productId = productId;
+  button.textContent = 'Add to Cart';
 
   let addedTimer;
 
@@ -58,52 +53,34 @@ export function createAddToCartButton(productId, select, addedToCart, cartQ) {
     }, 2000);
   }
 
-  function addBtnLogic() {
-    const cart = getCart(); // pull latest cart from localStorage
-    const productQuantity = parseInt(select.value);
-    const existingProduct = cart.find(item => item.productId === productId);
+  button.addEventListener('click', () => {
+    const cart = getCart();
+    const qty = Number(select.value);
+    const existingItem = cart.find(item => item.productId === productId);
 
-    if (existingProduct) {
-      existingProduct.quantity += productQuantity;
-    } else {
-      cart.push({
-        productId,
-        quantity: productQuantity,
-        deliveryOptionId: '1'
-      });
-    }
+    if (existingItem) existingItem.quantity += qty;
+    else cart.push({ productId, quantity: qty, deliveryOptionId: '1' });
 
-    // Save updated cart to localStorage
     saveCart(cart);
-
-    // Now call the shared function
     updateCartQuantityDisplay(cartQ);
-
-    console.log(cart);
-
-  }
-
-  addToCartButton.addEventListener('click', () => {
-    addBtnLogic();
     addedTimeOut();
   });
 
-  return addToCartButton;
+  return button;
 }
 
-
-// Create the full product card
+// Create Product Card
 export function createProductCard(product, cartQ) {
   const productContainer = document.createElement('div');
   productContainer.classList.add('product-container');
 
   // Image
-  const imageContainer = document.createElement('div');
-  imageContainer.classList.add('product-image-container');
+  const imgContainer = document.createElement('div');
+  imgContainer.classList.add('product-image-container');
   const img = document.createElement('img');
   img.classList.add('product-image');
   img.src = product.image;
-  imageContainer.appendChild(img);
+  imgContainer.appendChild(img);
 
   // Name
   const nameDiv = document.createElement('div');
@@ -133,6 +110,14 @@ export function createProductCard(product, cartQ) {
   const select = createQuantitySelector();
   quantityContainer.appendChild(select);
 
+  // Extra info (from class)
+  if (typeof product.extraInfoHTML === 'function') {
+    const extraInfoDiv = document.createElement('div');
+    extraInfoDiv.innerHTML = product.extraInfoHTML();
+    extraInfoDiv.classList.add('product-extra-info');
+    quantityContainer.appendChild(extraInfoDiv);
+  }
+
   // Spacer
   const spacer = document.createElement('div');
   spacer.classList.add('product-spacer');
@@ -140,21 +125,27 @@ export function createProductCard(product, cartQ) {
   // Added to cart
   const addedToCart = createAddedToCartElement();
 
-  // Add to Cart button
-  const addToCartButton = createAddToCartButton(product.id, select, addedToCart, cartQ);
+  // Add to cart button
+  const addButton = createAddToCartButton(product.id, select, addedToCart, cartQ);
 
   // Append all
-  productContainer.appendChild(imageContainer);
+  productContainer.appendChild(imgContainer);
   productContainer.appendChild(nameDiv);
   productContainer.appendChild(ratingContainer);
   productContainer.appendChild(priceDiv);
   productContainer.appendChild(quantityContainer);
   productContainer.appendChild(spacer);
   productContainer.appendChild(addedToCart);
-  productContainer.appendChild(addToCartButton);
+  productContainer.appendChild(addButton);
 
   return productContainer;
-  }
+}
 
+//render all products 
 
-
+/*export function renderProducts(container) {
+  products.forEach(product => {
+    const card = createProductCard(product, cartQunaity);
+    container.appendChild(card);
+  });
+} */
