@@ -1,7 +1,14 @@
 import {getCart, saveCart} from '../data/cart.js'
+import { loadProducts } from '../data/products.js';
 
 
 describe("Cart functions", () => {
+
+beforeAll((done) => {
+  loadProducts()
+  done()
+}) 
+
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
