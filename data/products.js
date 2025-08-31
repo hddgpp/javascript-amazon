@@ -1,37 +1,74 @@
-class p {
+import { renderProducts } from '../scripts/amazon.js';
+
+class Product {
   id;
   image;
   name;
   rating;
   priceCents;
-  constructor(productsDetails) {
-    this.id = productsDetails.id
-    this.image = productsDetails.image
-    this.name = productsDetails.name
-    this.rating = productsDetails.rating
-    this.priceCents = productsDetails.priceCents
+
+  constructor(productDetails) {
+    this.id = productDetails.id;
+    this.image = productDetails.image;
+    this.name = productDetails.name;
+    this.rating = productDetails.rating;
+    this.priceCents = productDetails.priceCents;
   }
 
   extraInfoHTML() {
-    return ''
+    return '';
   }
 }
 
-class Clothings extends p {
+class Clothing extends Product {
   sizeChartLink;
 
-  constructor(productsDetails) {
-      super(productsDetails)
-    this.sizeChartLink = productsDetails.sizeChartLink
+  constructor(productDetails) {
+    super(productDetails);
+    this.sizeChartLink = productDetails.sizeChartLink;
   }
 
-extraInfoHTML() {
-   return `<a href="${this.sizeChartLink}" target="_blank">Size chart</a>`
+  extraInfoHTML() {
+    return `<a href="${this.sizeChartLink}" target="_blank">Size chart</a>`;
   }
-  
 }
 
-export const products = [
+// Exported products array
+export let products = [];
+
+// Load products and run callback once loaded
+export function loadProducts(callback) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.addEventListener('load', () => {
+    products = JSON.parse(xhr.response).map(productDetails => {
+      if (productDetails.type === 'clothing') {
+        return new Clothing(productDetails);
+      } else {
+        return new Product(productDetails);
+      }
+    });
+
+    if (callback && typeof callback === 'function') {
+      callback(products);
+    }
+
+    console.log('Products loaded:', products);
+  });
+
+  xhr.open('GET', 'https://supersimplebackend.dev/products');
+  xhr.send();
+}
+
+loadProducts()
+
+// Optional: call loadProducts here if you want immediate load on script import
+// loadProducts(renderProducts);
+
+
+/* 
+
+ export const products = [
   {
     id: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
     image: "images/products/athletic-cotton-socks-6-pairs.jpg",
@@ -696,5 +733,7 @@ export const products = [
   } else {
      return new p(productsDetails)
   }
-  
-})
+
+}) 
+
+*/

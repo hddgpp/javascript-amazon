@@ -1,30 +1,38 @@
-import { products } from '../data/products.js';
+import { products, loadProducts } from '../data/products.js';
 import { getCart, saveCart } from '../data/cart.js';
 import { updateCartQuantityDisplay } from './amazon.product.js';
 import { deliveryOptionArr } from "../data/deleveryOption.js";
-import '../data/backend-practise.js';
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
 
 const returnToHomeLink = document.querySelector('.return-to-home-link');
-let cart = getCart();
-
-// Update header quantity
-const totalQuantity = updateCartQuantityDisplay(); 
-returnToHomeLink.textContent = `Checkout ${totalQuantity} items`;
-
 const orderSummary = document.querySelector('.order-summary');
-orderSummary.innerHTML = ''; // Clear any existing content
-
-// payment summary 
 const paymentSummaryContainer = document.querySelector('.payment-summary');
-paymentSummaryContainer.innerHTML = ''; // Clear existing content
 
-function calculateCartTotals() {
+// Load products first, then render everything
+loadProducts(() => {
+  const cart = getCart();
+
+  // Update header quantity
+  const totalQuantity = updateCartQuantityDisplay();
+  returnToHomeLink.textContent = `Checkout ${totalQuantity} items`;
+
+  // Render payment summary
+  renderPaymentSummary(cart);
+
+  // Render cart items
+  renderCartItems(cart);
+});
+
+// --------------------- FUNCTIONS ---------------------
+
+function calculateCartTotals(cart) {
   let itemsTotal = 0;
   let shippingTotal = 0;
 
   cart.forEach(cartItem => {
     const product = products.find(p => p.id === cartItem.productId);
+    if (!product) return;
+
     itemsTotal += product.priceCents * cartItem.quantity;
 
     const deliveryOption = deliveryOptionArr.find(opt => opt.id === cartItem.deliveryOptionId) || deliveryOptionArr[0];
@@ -44,264 +52,212 @@ function calculateCartTotals() {
   };
 }
 
-export function renderPaymentSummary() {
+function renderPaymentSummary(cart) {
   paymentSummaryContainer.innerHTML = ''; // clear previous
+  const totals = calculateCartTotals(cart);
+  const formatMoney = cents => `$${(cents / 100).toFixed(2)}`;
 
-  const totals = calculateCartTotals();
-  const formatMoney = (cents) => `$${(cents / 100).toFixed(2)}`;
-
-  // Title
   const title = document.createElement('div');
   title.className = 'payment-summary-title';
   title.textContent = 'Order Summary';
   paymentSummaryContainer.appendChild(title);
 
-  // Items row
-  const itemsRow = document.createElement('div');
-  itemsRow.className = 'payment-summary-row';
-  const itemsLabel = document.createElement('div');
-  itemsLabel.textContent = `Items (${cart.reduce((sum, item) => sum + item.quantity, 0)}):`;
-  const itemsMoney = document.createElement('div');
-  itemsMoney.className = 'payment-summary-money';
-  itemsMoney.textContent = formatMoney(totals.itemsTotalCents);
-  itemsRow.appendChild(itemsLabel);
-  itemsRow.appendChild(itemsMoney);
-  paymentSummaryContainer.appendChild(itemsRow);
+  const rows = [
+    { label: `Items (${cart.reduce((sum, i) => sum + i.quantity, 0)}):`, value: totals.itemsTotalCents },
+    { label: 'Shipping & handling:', value: totals.shippingCents },
+    { label: 'Total before tax:', value: totals.subtotalCents, className: 'subtotal-row' },
+    { label: 'Estimated tax (10%):', value: totals.taxCents },
+    { label: 'Order total:', value: totals.orderTotalCents, className: 'total-row' }
+  ];
 
-  // Shipping row
-  const shippingRow = document.createElement('div');
-  shippingRow.className = 'payment-summary-row';
-  const shippingLabel = document.createElement('div');
-  shippingLabel.textContent = 'Shipping & handling:';
-  const shippingMoney = document.createElement('div');
-  shippingMoney.className = 'payment-summary-money';
-  shippingMoney.textContent = formatMoney(totals.shippingCents);
-  shippingRow.appendChild(shippingLabel);
-  shippingRow.appendChild(shippingMoney);
-  paymentSummaryContainer.appendChild(shippingRow);
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'payment-summary-row';
+    if (r.className) row.classList.add(r.className);
 
-  // Subtotal row
-  const subtotalRow = document.createElement('div');
-  subtotalRow.className = 'payment-summary-row subtotal-row';
-  const subtotalLabel = document.createElement('div');
-  subtotalLabel.textContent = 'Total before tax:';
-  const subtotalMoney = document.createElement('div');
-  subtotalMoney.className = 'payment-summary-money';
-  subtotalMoney.textContent = formatMoney(totals.subtotalCents);
-  subtotalRow.appendChild(subtotalLabel);
-  subtotalRow.appendChild(subtotalMoney);
-  paymentSummaryContainer.appendChild(subtotalRow);
+    const labelDiv = document.createElement('div');
+    labelDiv.textContent = r.label;
+    const valueDiv = document.createElement('div');
+    valueDiv.className = 'payment-summary-money';
+    valueDiv.textContent = formatMoney(r.value);
 
-  // Tax row
-  const taxRow = document.createElement('div');
-  taxRow.className = 'payment-summary-row';
-  const taxLabel = document.createElement('div');
-  taxLabel.textContent = 'Estimated tax (10%):';
-  const taxMoney = document.createElement('div');
-  taxMoney.className = 'payment-summary-money';
-  taxMoney.textContent = formatMoney(totals.taxCents);
-  taxRow.appendChild(taxLabel);
-  taxRow.appendChild(taxMoney);
-  paymentSummaryContainer.appendChild(taxRow);
+    row.appendChild(labelDiv);
+    row.appendChild(valueDiv);
+    paymentSummaryContainer.appendChild(row);
+  });
 
-  // Order total row
-  const totalRow = document.createElement('div');
-  totalRow.className = 'payment-summary-row total-row';
-  const totalLabel = document.createElement('div');
-  totalLabel.textContent = 'Order total:';
-  const totalMoney = document.createElement('div');
-  totalMoney.className = 'payment-summary-money';
-  totalMoney.textContent = formatMoney(totals.orderTotalCents);
-  totalRow.appendChild(totalLabel);
-  totalRow.appendChild(totalMoney);
-  paymentSummaryContainer.appendChild(totalRow);
-
-  // Place order button
   const placeOrderBtn = document.createElement('button');
   placeOrderBtn.className = 'place-order-button button-primary';
   placeOrderBtn.textContent = 'Place your order';
   paymentSummaryContainer.appendChild(placeOrderBtn);
 }
 
-// Initial render
-renderPaymentSummary();
+function renderCartItems(cart) {
+  orderSummary.innerHTML = '';
 
-function updatePaymentSummary() {
-  renderPaymentSummary();
+  if (cart.length === 0) {
+    orderSummary.innerHTML = `<p>Your cart is empty.</p>
+      <a href="amazon.html"><button class="button-primary">Home</button></a>`;
+    paymentSummaryContainer.innerHTML = '';
+    return;
+  }
+
+  cart.forEach(cartItem => {
+    const product = products.find(p => p.id === cartItem.productId);
+    if (!product) return;
+
+    const cartItemContainer = document.createElement('div');
+    cartItemContainer.className = 'cart-item-container';
+
+    // Delivery date
+    const deliveryDate = document.createElement('div');
+    deliveryDate.className = 'delivery-date';
+    const defaultOption = deliveryOptionArr.find(opt => opt.id === cartItem.deliveryOptionId) || deliveryOptionArr[0];
+    deliveryDate.textContent = `Delivery date: ${dayjs().add(defaultOption.deliveryDays, 'days').format('dddd, MMMM D')}`;
+    cartItemContainer.appendChild(deliveryDate);
+
+    // Grid container
+    const detailsGrid = document.createElement('div');
+    detailsGrid.className = 'cart-item-details-grid';
+    cartItemContainer.appendChild(detailsGrid);
+
+    // Product image
+    const productImage = document.createElement('img');
+    productImage.className = 'product-image';
+    productImage.src = product.image;
+    detailsGrid.appendChild(productImage);
+
+    // Product details
+    const detailsDiv = document.createElement('div');
+    detailsDiv.className = 'cart-item-details';
+    detailsGrid.appendChild(detailsDiv);
+
+    const nameDiv = document.createElement('div');
+    nameDiv.className = 'product-name';
+    nameDiv.textContent = product.name;
+    detailsDiv.appendChild(nameDiv);
+
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'product-price';
+    priceDiv.textContent = `$${(product.priceCents / 100).toFixed(2)}`;
+    detailsDiv.appendChild(priceDiv);
+
+    // Quantity controls
+    const quantityDiv = document.createElement('div');
+    quantityDiv.className = 'product-quantity';
+    quantityDiv.innerHTML = `
+      <span>Quantity: <span class="quantity-label">${cartItem.quantity}</span></span>
+      <span class="update-quantity-link link-primary">Update</span>
+      <span class="delete-quantity-link link-primary">Delete</span>
+    `;
+    detailsDiv.appendChild(quantityDiv);
+
+    const updateLink = quantityDiv.querySelector('.update-quantity-link');
+    updateLink.addEventListener('click', () => handleUpdateQuantity(cartItem, quantityDiv));
+
+    const deleteLink = quantityDiv.querySelector('.delete-quantity-link');
+    deleteLink.addEventListener('click', () => handleDeleteItem(cartItem, cartItemContainer, cart));
+
+    // Delivery options
+    renderDeliveryOptions(cartItem, detailsGrid, cart);
+
+    orderSummary.appendChild(cartItemContainer);
+  });
 }
 
-// this is the end of the payment summary
+// ------------------- HELPERS -------------------
 
-cart.forEach(cartItem => {
-  const productId = cartItem.productId;
-  const matchingProduct = products.find(p => p.id === productId);
+function handleUpdateQuantity(cartItem, quantityDiv) {
+  const updateInput = document.createElement('input');
+  updateInput.type = 'number';
+  updateInput.value = cartItem.quantity;
+  updateInput.min = 1;
 
-  // Container
-  const cartItemContainer = document.createElement('div');
-  cartItemContainer.className = 'cart-item-container';
+  const label = quantityDiv.querySelector('.quantity-label');
+  label.replaceWith(updateInput);
+  updateInput.focus();
 
-  // Delivery date
-  const deliveryDate = document.createElement('div');
-  deliveryDate.className = 'delivery-date';
-  const defaultOption = deliveryOptionArr.find(opt => opt.id === cartItem.deliveryOptionId) || deliveryOptionArr[0];
-  deliveryDate.textContent = `Delivery date: ${dayjs().add(defaultOption.deliveryDays, 'days').format('dddd, MMMM D')}`;
-  cartItemContainer.appendChild(deliveryDate);
+  updateInput.addEventListener('keypress', event => {
+    if (event.key === 'Enter') {
+      const newQty = Number(updateInput.value);
+      if (newQty > 0) {
+        const cart = getCart();
+        const idx = cart.findIndex(i => i.productId === cartItem.productId);
+        if (idx !== -1) cart[idx].quantity = newQty;
+        saveCart(cart);
 
-  // Grid container
-  const cartItemDetailsGrid = document.createElement('div');
-  cartItemDetailsGrid.className = 'cart-item-details-grid';
-  cartItemContainer.appendChild(cartItemDetailsGrid);
+        updateInput.replaceWith(label);
+        label.textContent = newQty;
 
-  // Product image
-  const productImage = document.createElement('img');
-  productImage.className = 'product-image';
-  productImage.src = matchingProduct.image;
-  cartItemDetailsGrid.appendChild(productImage);
-
-  // Product details
-  const cartItemDetails = document.createElement('div');
-  cartItemDetails.className = 'cart-item-details';
-  cartItemDetailsGrid.appendChild(cartItemDetails);
-
-  const productName = document.createElement('div');
-  productName.className = 'product-name';
-  productName.textContent = matchingProduct.name;
-  cartItemDetails.appendChild(productName);
-
-  const productPrice = document.createElement('div');
-  productPrice.className = 'product-price';
-  productPrice.textContent = `$${(Math.round(matchingProduct.priceCents) / 100).toFixed(2)}`;
-  cartItemDetails.appendChild(productPrice);
-
-  // Quantity controls
-  const productQuantity = document.createElement('div');
-  productQuantity.className = 'product-quantity';
-  productQuantity.innerHTML = `
-    <span>
-      Quantity: <span class="quantity-label">${cartItem.quantity}</span>
-    </span>
-    <span class="update-quantity-link link-primary">Update</span>
-    <span class="delete-quantity-link link-primary">Delete</span>
-  `;
-  cartItemDetails.appendChild(productQuantity);
-
-  // Update quantity
-  const updateLink = productQuantity.querySelector('.update-quantity-link');
-  updateLink.addEventListener('click', () => {
-    const updateInput = document.createElement('input');
-    updateInput.type = 'number';
-    updateInput.value = cartItem.quantity;
-    updateInput.min = 1;
-
-    const quantityLabel = productQuantity.querySelector('.quantity-label');
-    quantityLabel.replaceWith(updateInput);
-
-    updateInput.focus();
-
-    updateInput.addEventListener('keypress', (event) => {
-      if (event.key === 'Enter') {
-        const newQuantity = Number(updateInput.value);
-        if (newQuantity > 0) {
-          const index = cart.findIndex(item => item.productId === productId);
-          if (index !== -1) {
-            cart[index].quantity = newQuantity;
-            saveCart(cart);
-          }
-          updateInput.replaceWith(quantityLabel);
-          quantityLabel.textContent = newQuantity;
-
-          const newTotal = updateCartQuantityDisplay();
-          returnToHomeLink.textContent = `Checkout ${newTotal} items`;
-
-          // Update payment summary
-          updatePaymentSummary();
-        }
+        const newTotal = updateCartQuantityDisplay();
+        returnToHomeLink.textContent = `Checkout ${newTotal} items`;
+        renderPaymentSummary(cart);
       }
-    });
-  });
-
-  // Delete quantity
-  const deleteLink = productQuantity.querySelector('.delete-quantity-link');
-  deleteLink.addEventListener('click', () => {
-    const index = cart.findIndex(item => item.productId === productId);
-    if (index !== -1) {
-      cart.splice(index, 1);
-      saveCart(cart);
     }
-    cartItemContainer.remove();
-    const newTotal = updateCartQuantityDisplay();
-    returnToHomeLink.textContent = `Checkout ${newTotal} items`;
-
-    // Update payment summary
-    updatePaymentSummary();
   });
+}
 
-  // Delivery options
-  const deliveryOptions = document.createElement('div');
-  deliveryOptions.className = 'delivery-options';
-  cartItemDetailsGrid.appendChild(deliveryOptions);
+function handleDeleteItem(cartItem, container, cart) {
+  const idx = cart.findIndex(i => i.productId === cartItem.productId);
+  if (idx !== -1) cart.splice(idx, 1);
+  saveCart(cart);
 
-  const deliveryOptionsTitle = document.createElement('div');
-  deliveryOptionsTitle.className = 'delivery-options-title';
-  deliveryOptionsTitle.textContent = 'Choose a delivery option:';
-  deliveryOptions.appendChild(deliveryOptionsTitle);
+  container.remove();
+  const newTotal = updateCartQuantityDisplay();
+  returnToHomeLink.textContent = `Checkout ${newTotal} items`;
+
+  renderPaymentSummary(cart);
+}
+
+function renderDeliveryOptions(cartItem, detailsGrid, cart) {
+  const deliveryDiv = document.createElement('div');
+  deliveryDiv.className = 'delivery-options';
+  detailsGrid.appendChild(deliveryDiv);
+
+  const title = document.createElement('div');
+  title.className = 'delivery-options-title';
+  title.textContent = 'Choose a delivery option:';
+  deliveryDiv.appendChild(title);
 
   deliveryOptionArr.forEach((option, index) => {
     const today = dayjs();
     const deliveryDay = today.add(option.deliveryDays, 'days');
     const deliveryString = deliveryDay.format('dddd, MMMM D');
+    const priceString = option.priceCent === 0 ? 'Free' : `$${(option.priceCent / 100).toFixed(2)}`;
 
-    const priceString = option.priceCent === 0
-      ? 'Free'
-      : `$${(option.priceCent / 100).toFixed(2)}`;
-
-    const deliveryOption = document.createElement('div');
-    deliveryOption.className = 'delivery-option';
+    const optionDiv = document.createElement('div');
+    optionDiv.className = 'delivery-option';
 
     const input = document.createElement('input');
     input.type = 'radio';
     input.className = 'delivery-option-input';
-    input.name = `delivery-option-${productId}`;
+    input.name = `delivery-option-${cartItem.productId}`;
     input.checked = cartItem.deliveryOptionId === option.id || (!cartItem.deliveryOptionId && index === 0);
-    deliveryOption.appendChild(input);
+    optionDiv.appendChild(input);
 
-    const optionInfo = document.createElement('div');
-    const optionDate = document.createElement('div');
-    optionDate.className = 'delivery-option-date';
-    optionDate.textContent = deliveryString;
-    optionInfo.appendChild(optionDate);
+    const infoDiv = document.createElement('div');
+    const dateDiv = document.createElement('div');
+    dateDiv.className = 'delivery-option-date';
+    dateDiv.textContent = deliveryString;
+    const priceDiv = document.createElement('div');
+    priceDiv.className = 'delivery-option-price';
+    priceDiv.textContent = `${priceString} Shipping`;
 
-    const optionPrice = document.createElement('div');
-    optionPrice.className = 'delivery-option-price';
-    optionPrice.textContent = `${priceString} Shipping`;
-    optionInfo.appendChild(optionPrice);
+    infoDiv.appendChild(dateDiv);
+    infoDiv.appendChild(priceDiv);
+    optionDiv.appendChild(infoDiv);
 
-    deliveryOption.appendChild(optionInfo);
-    deliveryOptions.appendChild(deliveryOption);
-
-    // Update delivery selection
     input.addEventListener('change', () => {
       if (input.checked) {
-        deliveryDate.textContent = `Delivery date: ${deliveryString}`;
-        const index = cart.findIndex(item => item.productId === productId);
-        if (index !== -1) {
-          cart[index].deliveryOptionId = option.id;
+        const idx = cart.findIndex(i => i.productId === cartItem.productId);
+        if (idx !== -1) {
+          cart[idx].deliveryOptionId = option.id;
           saveCart(cart);
-
-          // Update payment summary
-          updatePaymentSummary();
+          renderPaymentSummary(cart);
         }
       }
     });
+
+    deliveryDiv.appendChild(optionDiv);
   });
-
-  orderSummary.appendChild(cartItemContainer);
-});
-
-if (cart.length === 0) {
-  orderSummary.innerHTML = `<p>Your cart is empty.</p>
-  <a href="amazon.html"><button class="button-primary">Home</button></a>
-  `;
-
-  paymentSummaryContainer.innerHTML = '';
 }
