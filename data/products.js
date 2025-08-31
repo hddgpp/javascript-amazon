@@ -696,5 +696,5 @@ export const products = [
   } else {
      return new p(productsDetails)
   }
- 
+  
 })
