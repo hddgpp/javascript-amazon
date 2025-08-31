@@ -2,6 +2,7 @@ import { products } from '../data/products.js';
 import { getCart, saveCart } from '../data/cart.js';
 import { updateCartQuantityDisplay } from './amazon.product.js';
 import { deliveryOptionArr } from "../data/deleveryOption.js";
+import '../data/backend-practise.js';
 import dayjs from 'https://unpkg.com/supersimpledev@8.5.0/dayjs/esm/index.js';
 
 const returnToHomeLink = document.querySelector('.return-to-home-link');
