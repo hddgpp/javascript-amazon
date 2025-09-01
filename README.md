@@ -3,6 +3,8 @@
 A simple Amazon-style shopping web app built with Vanilla JavaScript, HTML, and CSS.
 This project lets you browse products, add them to a cart, and checkout with a clean, responsive UI.
 
+---
+
 🚀 Features
 
 Fetches products from a backend API
@@ -19,6 +21,8 @@ Cart saved in localStorage (persists between sessions)
 
 Logic implemented with Promises and fetch API 
 
+---
+
 🛠️ Tech Stack
 
 HTML5
@@ -30,6 +34,20 @@ Vanilla JavaScript (ES6+)
 LocalStorage for persistence
 
 Async operations with Promises & Fetch
+
+---
+
+📂 How to Run
+
+Clone or download the repo
+
+Open the project folder in VS Code (or any editor)
+
+Use Live Server (or open manually in your browser)
+
+Start from amazon.html → this is the main homepage
+
+---
 
 🙏 Credits
 
