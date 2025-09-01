@@ -52,8 +52,6 @@ export function loadProducts(callback) {
     if (callback && typeof callback === 'function') {
       callback(products);
     }
-
-    console.log('Products loaded:', products);
   });
 
   xhr.open('GET', 'https://supersimplebackend.dev/products');

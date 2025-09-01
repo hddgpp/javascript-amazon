@@ -8,7 +8,7 @@ export function renderProducts(products) {
   const cartQ = document.querySelector('.cart-quantity');
 
   if (!productsGrid || !cartQ) {
-    console.warn('Products grid or cart quantity element not found in DOM.');
+    
     return; // Prevent crashes if elements are missing
   }
 

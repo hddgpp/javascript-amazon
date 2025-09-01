@@ -8,8 +8,13 @@ const returnToHomeLink = document.querySelector('.return-to-home-link');
 const orderSummary = document.querySelector('.order-summary');
 const paymentSummaryContainer = document.querySelector('.payment-summary');
 
-// Load products first, then render everything
-loadProducts(() => {
+
+
+new Promise((resolve) => {
+  loadProducts(() => {
+    resolve()
+  })
+}).then(() => {
   const cart = getCart();
 
   // Update header quantity
@@ -21,7 +26,7 @@ loadProducts(() => {
 
   // Render cart items
   renderCartItems(cart);
-});
+})
 
 // --------------------- FUNCTIONS ---------------------
 
