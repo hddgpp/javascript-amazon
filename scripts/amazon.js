@@ -8,7 +8,6 @@ export function renderProducts(products) {
   const cartQ = document.querySelector('.cart-quantity');
 
   if (!productsGrid || !cartQ) {
-    
     return; // Prevent crashes if elements are missing
   }
 
@@ -23,5 +22,11 @@ export function renderProducts(products) {
 
 // Wait until DOM is fully loaded before doing anything
 document.addEventListener('DOMContentLoaded', () => {
-  loadProducts(renderProducts);
+  loadProducts()
+    .then(products => {
+      renderProducts(products);
+    })
+    .catch(error => {
+      console.error('Failed to load products:', error);
+    });
 });

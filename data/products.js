@@ -37,11 +37,11 @@ class Clothing extends Product {
 export let products = [];
 
 // Load products and run callback once loaded
-export function loadProducts(callback) {
-  const xhr = new XMLHttpRequest();
-
-  xhr.addEventListener('load', () => {
-    products = JSON.parse(xhr.response).map(productDetails => {
+function loadProductsFetsh() {
+  fetch('https://supersimplebackend.dev/products').then((response) => {
+    return response.json()
+  }).then((productsData) => {
+    products = productsData.map(productDetails => {
       if (productDetails.type === 'clothing') {
         return new Clothing(productDetails);
       } else {
@@ -52,11 +52,33 @@ export function loadProducts(callback) {
     if (callback && typeof callback === 'function') {
       callback(products);
     }
-  });
-
-  xhr.open('GET', 'https://supersimplebackend.dev/products');
-  xhr.send();
+  })
 }
+
+export function loadProducts() {
+  return fetch('https://supersimplebackend.dev/products')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      products = data.map(productDetails => {
+        if (productDetails.type === 'clothing') {
+          return new Clothing(productDetails);
+        } else {
+          return new Product(productDetails);
+        }
+      });
+      return products; // ✅ return products so caller can use them
+    })
+    .catch(error => {
+      console.error('Error loading products:', error);
+      throw error; // rethrow so caller can catch it too
+    });
+}
+
 
 loadProducts()
 

@@ -8,28 +8,20 @@ const returnToHomeLink = document.querySelector('.return-to-home-link');
 const orderSummary = document.querySelector('.order-summary');
 const paymentSummaryContainer = document.querySelector('.payment-summary');
 
-
-
-new Promise((resolve) => {
-  loadProducts(() => {
-    resolve()
-  })
-}).then(() => {
+// ------------------- INIT -------------------
+loadProducts().then(() => {
   const cart = getCart();
 
   // Update header quantity
   const totalQuantity = updateCartQuantityDisplay();
   returnToHomeLink.textContent = `Checkout ${totalQuantity} items`;
 
-  // Render payment summary
+  // Render everything
   renderPaymentSummary(cart);
-
-  // Render cart items
   renderCartItems(cart);
-})
+});
 
 // --------------------- FUNCTIONS ---------------------
-
 function calculateCartTotals(cart) {
   let itemsTotal = 0;
   let shippingTotal = 0;
@@ -58,7 +50,7 @@ function calculateCartTotals(cart) {
 }
 
 function renderPaymentSummary(cart) {
-  paymentSummaryContainer.innerHTML = ''; // clear previous
+  paymentSummaryContainer.innerHTML = '';
   const totals = calculateCartTotals(cart);
   const formatMoney = cents => `$${(cents / 100).toFixed(2)}`;
 
@@ -115,11 +107,11 @@ function renderCartItems(cart) {
     cartItemContainer.className = 'cart-item-container';
 
     // Delivery date
-    const deliveryDate = document.createElement('div');
-    deliveryDate.className = 'delivery-date';
+    const deliveryDateDiv = document.createElement('div');
+    deliveryDateDiv.className = 'delivery-date';
     const defaultOption = deliveryOptionArr.find(opt => opt.id === cartItem.deliveryOptionId) || deliveryOptionArr[0];
-    deliveryDate.textContent = `Delivery date: ${dayjs().add(defaultOption.deliveryDays, 'days').format('dddd, MMMM D')}`;
-    cartItemContainer.appendChild(deliveryDate);
+    deliveryDateDiv.textContent = `Delivery date: ${dayjs().add(defaultOption.deliveryDays, 'days').format('dddd, MMMM D')}`;
+    cartItemContainer.appendChild(deliveryDateDiv);
 
     // Grid container
     const detailsGrid = document.createElement('div');
@@ -164,14 +156,13 @@ function renderCartItems(cart) {
     deleteLink.addEventListener('click', () => handleDeleteItem(cartItem, cartItemContainer, cart));
 
     // Delivery options
-    renderDeliveryOptions(cartItem, detailsGrid, cart);
+    renderDeliveryOptions(cartItem, detailsGrid, cart, deliveryDateDiv);
 
     orderSummary.appendChild(cartItemContainer);
   });
 }
 
 // ------------------- HELPERS -------------------
-
 function handleUpdateQuantity(cartItem, quantityDiv) {
   const updateInput = document.createElement('input');
   updateInput.type = 'number';
@@ -214,7 +205,7 @@ function handleDeleteItem(cartItem, container, cart) {
   renderPaymentSummary(cart);
 }
 
-function renderDeliveryOptions(cartItem, detailsGrid, cart) {
+function renderDeliveryOptions(cartItem, detailsGrid, cart, deliveryDateDiv) {
   const deliveryDiv = document.createElement('div');
   deliveryDiv.className = 'delivery-options';
   detailsGrid.appendChild(deliveryDiv);
@@ -258,6 +249,9 @@ function renderDeliveryOptions(cartItem, detailsGrid, cart) {
         if (idx !== -1) {
           cart[idx].deliveryOptionId = option.id;
           saveCart(cart);
+
+          // Update the delivery date display
+          deliveryDateDiv.textContent = `Delivery date: ${deliveryString}`;
           renderPaymentSummary(cart);
         }
       }
