@@ -36,7 +36,6 @@ class Clothing extends Product {
 // Exported products array
 export let products = [];
 
-// Load products and run callback once loaded
 function loadProductsFetsh() {
   fetch('https://supersimplebackend.dev/products').then((response) => {
     return response.json()
@@ -71,11 +70,11 @@ export function loadProducts() {
           return new Product(productDetails);
         }
       });
-      return products; // ✅ return products so caller can use them
+      return products; 
     })
     .catch(error => {
       console.error('Error loading products:', error);
-      throw error; // rethrow so caller can catch it too
+      throw error; 
     });
 }
 
