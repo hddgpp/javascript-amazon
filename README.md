@@ -13,11 +13,11 @@ Display products dynamically on the homepage
 
 Add/remove products from cart
 
-View total cart quantity in header
+View total cart quantity in the header
 
 Checkout page with full summary and delete functionality
 
-Cart saved in localStorage (persists between sessions)
+Cart saved in localStorage 
 
 Logic implemented with Promises and fetch API 
 
@@ -52,4 +52,4 @@ Start from amazon.html → this is the main homepage
 🙏 Credits
 
 The original project idea and base structure came from SuperSimpleDev.
-However, all logic, implementation, and code structure were written in my own way building my problem-solving skills and understanding of JavaScript deeply.
+However, all logic, implementation, and code structure were written in my own way, building my problem-solving skills and understanding of JavaScript deeply.
