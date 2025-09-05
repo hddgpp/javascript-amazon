@@ -41,7 +41,7 @@ Async operations with Promises & Fetch
 
 Clone or download the repo
 
-Open the project folder in VS Code (or any editor)
+Open the project folder in any editor
 
 Use Live Server (or open manually in your browser)
 
